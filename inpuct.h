@@ -26,3 +26,17 @@ struct three
     R = 1000000;
   }
 };
+
+class inpact
+{
+  three d;
+  string q;
+  hash_map pl;
+public:
+  inpact (string t);
+  /*three plut(three, three, string);
+  int GetPriority(string);
+  void buildtree();
+  double calculate();
+  double carculate(three*);*/
+};
