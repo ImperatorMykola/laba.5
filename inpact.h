@@ -17,13 +17,14 @@ struct three
 	{
 		od = p.od;
 		R = p.R;
-		left = p.left;
-		right = p.right;
+		left = &p.left;
+		right = &p.right;
 	}
 	three()
 	{
 		od = " ";
 		R = 1000000;
+		left=right=NULL;
 	}
 };
 class inpact
@@ -38,7 +39,7 @@ public:
 	three plut(three, three, string);
 	int GetPriority(string);
 	void pp(string);
-	void po();
+	three po();
 	void buildtree();
 	double calculate();
 	double carculate(three*);
@@ -71,11 +72,12 @@ void inpact::pp(string tt)
 				b = ger.top();
 				ger.pop();
 				c = plut(a, b, r);
+				cout << c.od;
 				ger.push(c);
 				op.push(tt);
 
 		};
-void inpact::po()
+three inpact::po()
 {
 				string r;
 				three a, b, c;
@@ -86,7 +88,9 @@ void inpact::po()
 				b = ger.top();
 				ger.pop();
 				c = plut(a, b, r);
+				cout << c.od << " "<< c.R << " "<< c.left->R << " " << c.right->R << " " <<c.right->od<< " "  << c.left->od << endl;
 				ger.push(c);
+				return c;
 		};
 int inpact::GetPriority(string cur_operator)
 {
@@ -107,6 +111,14 @@ three inpact::plut(three a, three b, string r)
 	three c;
 	c.od = r;
 	c.R = 100000;
+	// if(a.left==NULL)
+	// 	a.od=" ";
+	// if(a.right==NULL)
+	// 	a.od=" ";
+	// if(b.left==NULL)
+	// 	b.od=" ";
+	// if(b.right==NULL)
+	// 	b.od=" ";
 	c.left = &a;
 	c.right = &b;
 	return c;
@@ -161,7 +173,6 @@ else
 			r += q[i];
 			if (q[i + 1] == ')' || q[i + 1] == '(' || q[i + 1] == '+' || q[i + 1] == '-' || q[i + 1] == '*' || q[i + 1] == '/' || q[i + 1] == '^' || q[i + 1] == '<' || q[i + 1] == '>'||i==q.size()-1)
 			{
-				cout << r << " ";
 				if (pl.find(r) != pl.end())
 				{f = pl.find(r)->second;}
 				else
@@ -169,15 +180,19 @@ else
 				three c;
 				c.left = c.right = NULL;
 				c.R = f;
+				c.od=" ";
+				r.clear();
 				ger.push(c);
 			}
 		}
 	}
 	while (!op.empty())
 	{
-		po();
+		d=po();
 	}
-	d = ger.top();
+//	d = ger.top();
+	cout << d.od << " "<< d.R << d.left->R << " " << d.right->R << endl;
+
 }
 double inpact::calculate()
 {
@@ -185,22 +200,22 @@ double inpact::calculate()
 }
 double inpact::carculate(three* vz)
 {
-	//cout << vz->left->R;
 	if (vz->od != " ")
 	{
 		if (vz->od == "+")
 		{
-			return 1 + carculate(vz->left);
+			cout << "kb";
+			return carculate(vz->right) + carculate(vz->left);
 		}
 		if (vz->od == "-")
 			return carculate(vz->right) - carculate(vz->left);
 		if (vz->od == "*")
 		{
-			double r = 1;
+			double r = carculate(vz->right);
 			if (r == 0)
 				return 0;
 			else
-				return r * carculate(vz->left);
+				return r *carculate(vz->left);
 		}
 		if (vz->od == "/")
 		{
@@ -238,10 +253,10 @@ double inpact::carculate(three* vz)
 		if (vz->od == "<")
 			return carculate(vz->right) < carculate(vz->left);
 	}
-	else if (vz->od == " ")
+	else if (vz->R != 1000000)
 	{
 		cout <<vz->R << "|";
 		return vz->R;
 	}
-	return 0;
+	return 1;
 }
