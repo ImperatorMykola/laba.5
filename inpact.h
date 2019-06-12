@@ -1,3 +1,107 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <stack>
+#include <math.h>
+#include <unordered_map>
+using namespace std;
+typedef std::unordered_map<std::string, double>  hash_map;
+
+struct three
+{
+	string od;
+	double R;
+	three* left;
+	three* right;
+	void operator=(three p)
+	{
+		od = p.od;
+		R = p.R;
+		left = p.left;
+		right = p.right;
+	}
+	three()
+	{
+		od = " ";
+		R = 1000000;
+	}
+};
+class inpact
+{
+	three d;
+	string q;
+	hash_map pl;
+	stack <string> op;
+	stack <three> ger;
+public:
+	inpact (string t);
+	three plut(three, three, string);
+	int GetPriority(string);
+	void pp(string);
+	void po();
+	void buildtree();
+	double calculate();
+	double carculate(three*);
+};
+inpact::inpact(string t)
+{
+	ifstream fic(t);
+	string h, g;
+	double a;
+	while (!fic.eof())
+	{
+		getline(fic, h, '=');
+		if (fic.eof())
+			break;
+		getline(fic, g, '\n');
+		a = stod(g);
+		pl.insert(pair <string, double> (h, a));
+	}
+	q = h.substr(0, h.size());
+	buildtree();
+}
+void inpact::pp(string tt)
+{
+				string r;
+				three a, b, c;
+				r = op.top();
+				op.pop();
+				a = ger.top();
+				ger.pop();
+				b = ger.top();
+				ger.pop();
+				c = plut(a, b, r);
+				ger.push(c);
+				op.push(tt);
+
+		};
+void inpact::po()
+{
+				string r;
+				three a, b, c;
+				r = op.top();
+				op.pop();
+				a = ger.top();
+				ger.pop();
+				b = ger.top();
+				ger.pop();
+				c = plut(a, b, r);
+				ger.push(c);
+		};
+int inpact::GetPriority(string cur_operator)
+{
+	if (cur_operator == "+" || cur_operator == "-")
+		return 2;
+	if (cur_operator == "*" || cur_operator == "/")
+		return 3;
+	if (cur_operator == "==" || cur_operator == "!=" || cur_operator == "<=" || cur_operator == ">=" || cur_operator == ">" || cur_operator == "<")
+		return 1;
+	if (cur_operator == "^")
+		return 4;
+	if (cur_operator == "if" || cur_operator == "~")
+		return 5;
+	return 0;
+}
 three inpact::plut(three a, three b, string r)
 {
 	three c;
@@ -9,8 +113,6 @@ three inpact::plut(three a, three b, string r)
 }
 void inpact::buildtree()
 {
-	stack <string> op;
-	stack <three> ger;
 	string r;
 	for (int i = 0; i < q.size(); i++)
 	{
@@ -27,43 +129,18 @@ void inpact::buildtree()
 			r = q[i];
 			if (op.empty() || GetPriority(r) > GetPriority(op.top()))
 				op.push(r);
-			else
-			{
-				three a, b, c;
-				r = op.top();
-				op.pop();
-				a = ger.top();
-				ger.pop();
-				b = ger.top();
-				ger.pop();
-				c = plut(a, b, r);
-				ger.push(c);
-				r = q[i];
-				op.push(r);
-			}
+else
+			pp(r);
 			r.clear();
 		}
 		else if ((q[i] == '<' && q[i + 1] == '=') || (q[i] == '>' && q[i + 1] == '=') || (q[i] == '=' && q[i + 1] == '=') || (q[i] == '!' && q[i + 1] == '='))
 		{
 			r = q[i];
 			r += q[i + 1];
-			if (op.empty() || GetPriority(r) < GetPriority(op.top()))
+			if (op.empty() || GetPriority(r) > GetPriority(op.top()))
 				op.push(r);
-			else
-			{
-				three a, b, c;
-				r = op.top();
-				op.pop();
-				a = ger.top();
-				ger.pop();
-				b = ger.top();
-				ger.pop();
-				c = plut(a, b, r);
-				ger.push(c);
-				r = q[i];
-				r += q[i + 1];
-				op.push(r);
-			}
+	else
+			pp(r);
 			i++;
 			r.clear();
 		}
@@ -71,15 +148,7 @@ void inpact::buildtree()
 		{
 			while (op.top() != "(" || op.empty())
 			{
-				three a, b, c;
-				r = op.top();
-				op.pop();
-				a = ger.top();
-				ger.pop();
-				b = ger.top();
-				ger.pop();
-				c = plut(a, b, r);
-				ger.push(c);
+				po();
 			}
 			op.pop();
 			r.clear();
@@ -92,6 +161,7 @@ void inpact::buildtree()
 			r += q[i];
 			if (q[i + 1] == ')' || q[i + 1] == '(' || q[i + 1] == '+' || q[i + 1] == '-' || q[i + 1] == '*' || q[i + 1] == '/' || q[i + 1] == '^' || q[i + 1] == '<' || q[i + 1] == '>'||i==q.size()-1)
 			{
+				cout << r << " ";
 				if (pl.find(r) != pl.end())
 				{f = pl.find(r)->second;}
 				else
@@ -105,16 +175,73 @@ void inpact::buildtree()
 	}
 	while (!op.empty())
 	{
-		three a, b, c;
-		r = op.top();
-		op.pop();
-		a = ger.top();
-		ger.pop();
-		b = ger.top();
-		ger.pop();
-		cout << a.R << a.od << b.R << b.od;
-		c = plut(a, b, r);
-		ger.push(c);
+		po();
 	}
 	d = ger.top();
+}
+double inpact::calculate()
+{
+	return carculate(&d);
+}
+double inpact::carculate(three* vz)
+{
+	//cout << vz->left->R;
+	if (vz->od != " ")
+	{
+		if (vz->od == "+")
+		{
+			return 1 + carculate(vz->left);
+		}
+		if (vz->od == "-")
+			return carculate(vz->right) - carculate(vz->left);
+		if (vz->od == "*")
+		{
+			double r = 1;
+			if (r == 0)
+				return 0;
+			else
+				return r * carculate(vz->left);
+		}
+		if (vz->od == "/")
+		{
+			double r = carculate(vz->right);
+			if (r == 0)
+				return 0;
+			else
+				return r / carculate(vz->left);
+		}
+		if (vz->od == "^")
+		{
+			double l = carculate(vz->left);
+			if (l == 0)
+				return 1;
+			else
+				return pow(carculate(vz->right), l);
+		}
+		if (vz->od == "IF")
+		{
+			if (carculate(vz->right) == 1)
+				return carculate(vz->left->right);
+			else
+				return carculate(vz->left->left);
+		}
+		if (vz->od == "==")
+			return carculate(vz->right) == carculate(vz->left);
+		if (vz->od == "!=")
+			return carculate(vz->right) != carculate(vz->left);
+		if (vz->od == ">=")
+			return carculate(vz->right) >= carculate(vz->left);
+		if (vz->od == "<=")
+			return carculate(vz->right) <= carculate(vz->left);
+		if (vz->od == ">")
+			return carculate(vz->right) > carculate(vz->left);
+		if (vz->od == "<")
+			return carculate(vz->right) < carculate(vz->left);
+	}
+	else if (vz->od == " ")
+	{
+		cout <<vz->R << "|";
+		return vz->R;
+	}
+	return 0;
 }
