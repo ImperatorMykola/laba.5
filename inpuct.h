@@ -58,3 +58,26 @@ inpact::inpact(string t)
   q = h.substr(0, h.size() - 1);
   buildtree();
 }
+int inpact::GetPriority(string cur_operator)
+{
+	if (cur_operator == "+" || cur_operator == "-")
+		return 2;
+	if (cur_operator == "*" || cur_operator == "/")
+		return 3;
+	if (cur_operator == "==" || cur_operator == "!=" || cur_operator == "<=" || cur_operator == ">=" || cur_operator == ">" || cur_operator == "<")
+		return 1;
+	if (cur_operator == "^")
+		return 4;
+	if (cur_operator == "if" || cur_operator == "~")
+		return 5;
+	return 0;
+}
+three inpact::plut(three a, three b, string r)
+{
+	three c;
+	c.od = r;
+	c.R = 100000;
+	c.left = &a;
+	c.right = &b;
+	return c;
+}
